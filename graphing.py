@@ -20,6 +20,7 @@ def create_line_graph(name, lines, xlabel, ylabel, legend_loc=0):
 
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
+    plt.xlim([0, max(len(l.points) for l in lines])
     legend = plt.legend(loc=legend_loc,
         prop={'size':LEGEND_FONT_SIZE},
         fancybox=True,
@@ -29,7 +30,6 @@ def create_line_graph(name, lines, xlabel, ylabel, legend_loc=0):
     plt.savefig(name + '.pdf', format='pdf')
 
 def create_line_graph_from_csv(csvname, keys, xlabel, ylabel, legend_loc=0 order_by=None):
-
     results = {}
     lines = []
 
