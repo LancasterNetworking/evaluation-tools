@@ -7,11 +7,28 @@ LEGEND_COLUMN_SPACING = 0.5
 LEGEND_ALPHA = 0.2
 
 class LineGraph(object):
-    def __init__ (self, points, label)
+
+    def __init__ (self, points, label):
         self.points = points
         self.label = label
 
-def create_line_graph_from_csv(csvname, keys,  xlabel, ylabel, legend_loc=0, order_by=None):
+def create_line_graph(name, lines, xlabel, ylabel, legend_loc=0):
+    plt.clf()
+
+    for line in lines:
+        t, = plt.plot(line.points, label=line.label)
+
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    legend = plt.legend(loc=legend_loc,
+        prop={'size':LEGEND_FONT_SIZE},
+        fancybox=True,
+        ncol=3,
+        columnspacing=LEGEND_COLUMN_SPACING)
+    legend.get_frame().set_alpha(LEGEND_ALPHA)
+    plt.savefig(name + '.pdf', format='pdf')
+
+def create_line_graph_from_csv(csvname, keys, xlabel, ylabel, legend_loc=0 order_by=None):
 
     results = {}
     lines = []
@@ -32,21 +49,3 @@ def create_line_graph_from_csv(csvname, keys,  xlabel, ylabel, legend_loc=0, ord
 
     name = csvname.replace('.csv', '')
     create_line_graph(name, lines, xlabel, ylabel, legend_loc)
-
-def create_line_graph(name, lines, xlabel, ylabel, legend_loc=0):
-    plt.clf()
-
-    for line in lines:
-        t, = plt.plot(line.points, label=line.label)
-
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
-
-    legend = plt.legend(loc=legend_loc,
-        prop={'size':LEGEND_FONT_SIZE},
-        fancybox=True,
-        ncol=3,
-        columnspacing=LEGEND_COLUMN_SPACING)
-    legend.get_frame().set_alpha(LEGEND_ALPHA)
-
-    plt.savefig(name + '.pdf', format='pdf')
