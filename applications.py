@@ -12,10 +12,6 @@ import sys
 
 import scootplayer.scootplayer as sp
 
-CACHE_DATA = False
-
-cache = []
-
 class BandwidthLogger(object):
 
     def __init__(self, log_file, interfaces):
@@ -85,34 +81,12 @@ class BandwidthLogger(object):
     def stop(self):
         self.running = False
 
+class RTPComm(object):
 
-class AudioRTPClass:
-
-    def __init__(self, log_file, interfaces, time):
-
+    def __init__(self):
         self.interfaces = interfaces
-
-        self.rtp_log_file = open("rtp_log", 'w+', 1)
-        self.bw_log_file = open(log_file, 'w+', 1)
-
-        stream = """gstrtpbin name=rtpbin  \
-                  filesrc location="sintel-1024-surround.mp4" ! decodebin ! faac bitrate=320000 ! rtpmp4apay ! rtpbin.send_rtp_sink_1 \
-                  rtpbin.send_rtp_src_1 ! udpsink port=5002 \
-                  rtpbin.send_rtcp_src_1 ! udpsink port=5003 sync=false async=false  \
-                  udpsrc port=5007 ! rtpbin.recv_rtcp_sink_1 \n"""
-
-        self.streamer = gst.parse_launch (stream)
-
-        self.audiobin = self.streamer.get_by_name("rtpbin")
-
-        if self.audiobin:
-            self.audiobin.connect("on-ssrc-active", self.on_ssrc_active)
-
-        self.streamer.set_state(gst.STATE_PLAYING)
-
-        gobject.timeout_add(1000, self.write_stats)
-
-        gobject.timeout_add(time*1000, self.finish)
+        self.rtp_log_file = open(rtp_log_file, 'w+', 1)
+        self.bw_log_file = open(bw_log_file, 'w+', 1)
 
     def finish(self):
         print "Stop called\n"
@@ -180,6 +154,30 @@ class AudioRTPClass:
 
             except Exception as exc:
                 print exc
+
+class AudioRTPComm(RTPComm):
+
+    def __init__(self, interfaces, time, bw_log_file='rtp_bandwidth.log', rtp_log_file='rtp.log'):
+
+        stream = """gstrtpbin name=rtpbin  \
+                  filesrc location="sintel-1024-surround.mp4" ! decodebin ! faac bitrate=320000 ! rtpmp4apay ! rtpbin.send_rtp_sink_1 \
+                  rtpbin.send_rtp_src_1 ! udpsink port=5002 \
+                  rtpbin.send_rtcp_src_1 ! udpsink port=5003 sync=false async=false  \
+                  udpsrc port=5007 ! rtpbin.recv_rtcp_sink_1 \n"""
+
+        self.streamer = gst.parse_launch (stream)
+
+        self.audiobin = self.streamer.get_by_name("rtpbin")
+
+        if self.audiobin:
+            self.audiobin.connect("on-ssrc-active", self.on_ssrc_active)
+
+        self.streamer.set_state(gst.STATE_PLAYING)
+
+        gobject.timeout_add(1000, self.write_stats)
+
+        gobject.timeout_add(time*1000, self.finish)
+
 
 def file_transfer(url, file_list, download_path='./', log_file_name="file_transfer.log", cache_data=False):
     try:

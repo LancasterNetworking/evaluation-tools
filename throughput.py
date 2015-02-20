@@ -1,12 +1,12 @@
 #TODO
 # use pexpect
 
-def get_throughput_files(iface):
+def get_rx_tx_files(iface):
     rx = ''.join(['/sys/class/net/',str(iface),'/statistics/rx_bytes'])
     tx = ''.join(['/sys/class/net/',str(iface),'/statistics/tx_bytes'])
     return rx, tx
 
-def get_throughput_stats((rx_file, tx_file)):
+def get_rx_tx_stats((rx_file, tx_file)):
     try:
         with open(rx_file, 'r') as rf, open(tx_file, 'r') as tf:
             rx = ''.join(rf.readline().split())
