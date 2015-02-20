@@ -19,11 +19,14 @@ def create_line_graph(name, lines, xlabel, ylabel, legend=True, legend_loc=0):
     plt.clf()
 
     for line in lines:
+        print line.label
         t, = plt.plot(line.points, label=line.label)
 
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
-    plt.xlim([0, max([len(l.points) for l in lines])])
+    xaxis = max([len(l.points) for l in lines])
+    print 'x-axis: ' + xaxis
+    plt.xlim([min([0] + xaxis), max(xaxis)])
     if legend:
         legend = plt.legend(loc=legend_loc,
             prop={'size':LEGEND_FONT_SIZE},
@@ -34,7 +37,9 @@ def create_line_graph(name, lines, xlabel, ylabel, legend=True, legend_loc=0):
     plt.savefig(name + '.pdf', format='pdf')
 
 
-def create_line_graph_from_csv(csvname, keys, xlabel, ylabel, legend=True, labels=None, legend_loc=0, order_by=None):
+def create_line_graph_from_csv(
+        csvname, keys, xlabel, ylabel, legend=True,
+        labels=None, legend_loc=0, order_by=None):
     results = {}
     lines = []
 
@@ -60,8 +65,12 @@ def create_line_graph_from_csv(csvname, keys, xlabel, ylabel, legend=True, label
             for k in results.keys():
                 results[k].append(row[k])
 
-    for k in results.keys():
-        lines.append(LineGraph(results[k], str(k)))
+    for idx, key in enumerate(results.keys()):
+        if labels:
+            lines.append(LineGraph(results[key], labels[idx]))
+        else:
+            lines.append(LineGraph(results[key], str(key)))
 
     name = csvname.replace('.csv', '')
-    create_line_graph(name, lines, xlabel, ylabel, legend_loc)
+    create_line_graph(name, lines, xlabel, ylabel,
+        legend=legend, legend_loc=legend_loc)
