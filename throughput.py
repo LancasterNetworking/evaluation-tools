@@ -1,5 +1,6 @@
-#TODO
-# use pexpect
+import subprocess
+import threading
+
 
 def get_rx_tx_files(iface):
     rx = ''.join(['/sys/class/net/',str(iface),'/statistics/rx_bytes'])
@@ -35,8 +36,15 @@ def launch_process(cmd, success, failure):
     except:
         return None
 
+def launch_axel(url, threads=1):
+    cmd = ['axel', '-a', '-n', str(threads), url]
+    return launch_process(cmd, ('Starting', ), ('Unable', ))
+
+def launch_aria(url, threads=1):
+    cmd = ['aria2c', '-x', str(threads), url]
+    return launch_process(cmd, ('connected', ), ('refused', 'failed'))
+
 def launch_iperf(server_ip, time, bind, threads, wnd=64, wlen=8):
-    p = None
     if threads <= 0:
         threads = 1
     cmd = ['iperf', '-c', server_ip, '-t', str(time), '-P', str(threads)]
@@ -45,7 +53,6 @@ def launch_iperf(server_ip, time, bind, threads, wnd=64, wlen=8):
     return launch_process(cmd, ('connected', ), ('refused', 'failed'))
 
 def launch_wget(url, bind):
-    p = None
     cmd = ['wget', url]
     if bind is not None:
         cmd += ['--bind-address=', str(bind)]
