@@ -11,7 +11,7 @@ class ssh(object):
     def cmd(self, cmd):
         run = ''
         if identity_file is not None:
-            run = 'ssh -t -I%s %s "\'%s\'"' % (self.identity_file, self.host, cmd)
+            run = 'ssh -t -i%s %s "\'%s\'"' % (self.identity_file, self.host, cmd)
         else:
             run = 'ssh -t %s "\'%s\'"' % (self.host, cmd)
         os.system(run)
