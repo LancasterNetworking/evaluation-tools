@@ -7,6 +7,7 @@ def get_rx_tx_files(iface):
     tx = ''.join(['/sys/class/net/',str(iface),'/statistics/tx_bytes'])
     return rx, tx
 
+
 def get_rx_tx_stats((rx_file, tx_file)):
     try:
         with open(rx_file, 'r') as rf, open(tx_file, 'r') as tf:
@@ -18,14 +19,15 @@ def get_rx_tx_stats((rx_file, tx_file)):
 
     return (0, 0)
 
-def launch_process(cmd, success, failure):
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+def launch_process(cmd, success, failure, out=lambda x: x.stdout.read(1)):
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if p == None:
         return None
     poutput = ''
     try:
         while True:
-            o = p.stdout.read(1)
+            o = out(p)
             if o == '' and p.poll() != None:
                 return None
             poutput = ''.join([poutput, o])
@@ -33,16 +35,22 @@ def launch_process(cmd, success, failure):
                 return p.pid
             elif any(fail in poutput for fail in failure):
                 return None
-    except:
+    except Exception as e:
+        print e
         return None
+
 
 def launch_axel(url, threads=1):
     cmd = ['axel', '-a', '-n', str(threads), url]
-    return launch_process(cmd, ('Starting', ), ('Unable', ))
+    return launch_process(cmd, ('Starting', ), ('Unable', ),
+                            out=lambda x: x.stdout.read(1))
+
 
 def launch_aria(url, threads=1):
     cmd = ['aria2c', '-x', str(threads), url]
-    return launch_process(cmd, ('connected', ), ('refused', 'failed'))
+    return launch_process(cmd, ('connected', ), ('refused', 'failed'),
+                            out=lambda x: x.stdout.read(1))
+
 
 def launch_iperf(server_ip, time, bind, threads, wnd=64, wlen=8):
     if threads <= 0:
@@ -52,8 +60,10 @@ def launch_iperf(server_ip, time, bind, threads, wnd=64, wlen=8):
         cmd += ['-P', str(threads)]
     return launch_process(cmd, ('connected', ), ('refused', 'failed'))
 
+
 def launch_wget(url, bind):
     cmd = ['wget', url]
     if bind is not None:
         cmd += ['--bind-address=', str(bind)]
-    return launch_process(cmd, ('connected', ), ('refused', 'failed'))
+    return launch_process(cmd, ('connected', ), ('refused', 'failed'),
+                            out=lambda x: x.stderr.read(1))
