@@ -13,7 +13,10 @@ def print_psuedo_header(p):
     elif TCP in p:
         print ''.join(["TCP: (", p[IP].src,':', str(p[TCP].sport),
                         ' DST:', p[IP].dst, ':', str(p[TCP].dport),')',
-                        ' LEN: ', str(p[UDP].len)])
+                        ' LEN: ', str(p[TCP].len)])
+    else:
+        print ''.join(["Proto: (", p.src, ', ', p.dst, ')'])
+
 
 def psuedo_header(p):
     if any((UDP, TCP)) in p:
@@ -46,5 +49,11 @@ def load_packets(location, filter=lambda x: x is not None):
     return pkts
 
 
-def get_total_size(packets):
-    return sum(p.length for p in packets)
+def get_duration(packets):
+    start = min(packets, key=attrgetter('time'))
+    end = max(packets, key=attrgetter('time'))
+    return end
+
+
+def get_total_size(packets, proto='tcp'):
+    return sum(p[IP].len for p in packets)
