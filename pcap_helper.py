@@ -40,6 +40,10 @@ def load_tcp_packets(location):
     return load_packets(location, filter=lambda x: True if TCP in x else False)
 
 
+def get_time_values(pkts):
+    return [x.time for x in pkts]
+
+
 def load_packets(location, filter=lambda x: x is not None):
     pkts = []
     packets = rdpcap(location)
