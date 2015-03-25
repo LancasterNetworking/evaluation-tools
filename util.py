@@ -8,12 +8,15 @@ class ssh(object):
         self.host = host
         self.identity_file = identity_file
 
-    def cmd(self, cmd):
+    def cmd(self, cmd, sudo=False):
         run = ''
-        if identity_file is not None:
-            run = 'ssh -t -i%s %s "\'%s\'"' % (self.identity_file, self.host, cmd)
+        if sudo and 'sudo' not in cmd:
+            cmd = 'sudo ' + cmd
+        if self.identity_file is not None:
+            run = 'ssh -t -I%s %s "%s"' % (self.identity_file, self.host, cmd)
         else:
-            run = 'ssh -t %s "\'%s\'"' % (self.host, cmd)
+            run = 'ssh -t %s "%s"' % (self.host, cmd)
+        print run
         os.system(run)
 
 def clear_net_em(interface, call=lambda x: os.system(x)):
