@@ -103,5 +103,8 @@ if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		for i in range(0, sys.argv[1]):
 			print get_current(d)
+			time.sleep(1.00)
 	else:
-		print get_current(d)
+		while True:
+			print get_current(d)
+			time.sleep(1.00)
