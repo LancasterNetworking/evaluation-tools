@@ -21,6 +21,7 @@ def get_rx_tx_stats((rx_file, tx_file)):
 
 
 def launch_process(cmd, success, failure, out=lambda x: x.stdout.read(1)):
+    print ' '.join(cmd)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if p == None:
         return None
@@ -32,7 +33,7 @@ def launch_process(cmd, success, failure, out=lambda x: x.stdout.read(1)):
                 return None
             poutput = ''.join([poutput, o])
             if any(connect in poutput for connect in success):
-                return p.pid
+                return p
             elif any(fail in poutput for fail in failure):
                 return None
     except Exception as e:
@@ -52,7 +53,7 @@ def launch_aria(url, threads=1):
                             out=lambda x: x.stdout.read(1))
 
 
-def launch_iperf(server_ip, time, bind, threads, wnd=64, wlen=8):
+def launch_iperf(server_ip, time, bind=None, threads=1, wnd=64, wlen=8):
     if threads <= 0:
         threads = 1
     cmd = ['iperf', '-c', server_ip, '-t', str(time), '-P', str(threads)]

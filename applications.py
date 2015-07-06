@@ -117,7 +117,7 @@ class RTPComm(object):
         """SSRC Info Received"""
         #self.get_sprop()
         if rtpbin == self.audiobin:
-            print "on_ssrc_active: session %d" %  #(sessid, )
+            print "on_ssrc_active: session %d" %  (sessid, )
             try:
                 print ssrc
                 session = rtpbin.emit("get-internal-session", sessid)
@@ -222,7 +222,6 @@ def create_default_options(mpd):
     )
     return options
 
-def video_player():
-    url = "http://194.80.39.75:8080/ftp/datasets/mmsys12/BigBuckBunny/MPDs/BigBuckBunny_6s_isoffmain_DIS_23009_1_v_2_1c2_2011_08_30.mpd"
-    options = create_default_options(url)
+def video_player(mpd_url):
+    options = create_default_options(mpdurl)
     sp.Player(options)
