@@ -2,6 +2,7 @@
 from struct import *
 import glob
 import os
+import sys
 import subprocess
 import time
 import math
@@ -99,4 +100,8 @@ def check_crc(buff, length):
 if __name__ == '__main__':
 	os.system('modprobe w1-gpio')
 	d = open_dev()
-	print get_current(d)
+	if len(sys.argv) == 2:
+		for i in range(0, sys.argv[1]):
+			print get_current(d)
+	else:
+		print get_current(d)
