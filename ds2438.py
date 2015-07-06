@@ -101,7 +101,7 @@ if __name__ == '__main__':
 	os.system('modprobe w1-gpio')
 	d = open_dev()
 	if len(sys.argv) == 2:
-		for i in range(0, sys.argv[1]):
+		for i in range(0, int(sys.argv[1])):
 			print get_current(d)
 			time.sleep(1.00)
 	else:
